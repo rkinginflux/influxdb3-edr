@@ -1,0 +1,47 @@
+# Optional starting point for influxdata/influxdb3-enterprise chart 0.18.0.
+# Use a DIFFERENT cluster.id, bucket, admin-token Secret, and appropriate license
+# for each independent server cluster. This is not consumed by scripts/install.sh.
+cluster:
+  id: REPLACE_WITH_UNIQUE_CLUSTER_ID
+image:
+  tag: 3.12.2-enterprise
+license:
+  type: commercial
+  existingSecret: REPLACE_WITH_LICENSE_SECRET
+objectStorage:
+  type: s3
+  bucket: REPLACE_WITH_DATABASE_BUCKET
+  s3:
+    region: REPLACE_WITH_REGION
+    existingSecret: REPLACE_WITH_DATABASE_STORAGE_SECRET
+security:
+  auth:
+    adminToken:
+      existingSecret: REPLACE_WITH_ADMIN_TOKEN_SECRET
+ingress:
+  enabled: false
+processingEngine:
+  enabled: false
+serviceAccount:
+  automountServiceAccountToken: false
+ingester:
+  enabled: true
+  replicas: 1
+  numCores: 2
+  resources:
+    requests: {cpu: 500m, memory: 2Gi}
+    limits: {cpu: '2', memory: 4Gi}
+querier:
+  enabled: true
+  replicas: 1
+  numCores: 2
+  resources:
+    requests: {cpu: 500m, memory: 2Gi}
+    limits: {cpu: '2', memory: 4Gi}
+compactor:
+  enabled: true
+  replicas: 1
+  numCores: 2
+  resources:
+    requests: {cpu: 500m, memory: 1Gi}
+    limits: {cpu: '2', memory: 2Gi}

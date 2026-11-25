@@ -1,0 +1,29 @@
+# Copy to receiver-values.yaml and replace every REPLACE_WITH_... value.
+role: receiver
+image:
+  repository: REPLACE_WITH_PRIVATE_REGISTRY_IMAGE
+  tag: REPLACE_WITH_DELIVERED_IMAGE_TAG
+  pullPolicy: IfNotPresent
+state:
+  location: s3://REPLACE_WITH_STATE_BUCKET/receiver
+s3:
+  region: REPLACE_WITH_REGION
+  existingSecret: edr-receiver-storage
+  # For a custom S3 endpoint, uncomment and set the HTTPS URL:
+  # endpoint: https://object-store.example.com
+  # allowHttp: false
+tokenStore:
+  existingSecret: edr-link
+  extraSecrets:
+    - edr-destination-write
+receiver:
+  # Base URL of the destination's write-capable API, not its query-only API.
+  # Example: http://destination-ingester.database.svc.cluster.local:8181
+  writeEndpoint: REPLACE_WITH_DESTINATION_WRITE_BASE_URL
+  upstreams:
+    - name: edrs-edr
+      authToken: link-auth
+      writeToken: destination-write
+resources:
+  requests: {cpu: 100m, memory: 256Mi}
+  limits: {cpu: '2', memory: 2Gi}

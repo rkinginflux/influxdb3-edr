@@ -1,0 +1,34 @@
+# Copy to sender-values.yaml and replace every REPLACE_WITH_... value.
+role: sender
+image:
+  repository: REPLACE_WITH_PRIVATE_REGISTRY_IMAGE
+  tag: REPLACE_WITH_DELIVERED_IMAGE_TAG
+  pullPolicy: IfNotPresent
+state:
+  location: s3://REPLACE_WITH_STATE_BUCKET/sender
+s3:
+  region: REPLACE_WITH_REGION
+  existingSecret: edr-source-storage
+  # For a custom S3 endpoint, uncomment and set the HTTPS URL:
+  # endpoint: https://object-store.example.com
+  # allowHttp: false
+source:
+  releaseName: REPLACE_WITH_SOURCE_HELM_RELEASE
+  objectStore: s3
+  s3:
+    bucket: REPLACE_WITH_SOURCE_BUCKET
+# These are filenames in the projected Secret, not token values.
+tokenStore:
+  existingSecret: edr-link
+downstream:
+  address: http://edrr-edr:9090
+  authToken: link-auth
+  idempotentWrites: false
+  concurrentSends: 1
+  historicFill: none
+scope:
+  type: instance
+  excludeDatabases: [_internal, internal_edr]
+resources:
+  requests: {cpu: 100m, memory: 256Mi}
+  limits: {cpu: '2', memory: 2Gi}

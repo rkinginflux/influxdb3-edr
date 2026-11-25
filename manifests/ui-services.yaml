@@ -1,0 +1,35 @@
+# Optional UI-only Services. Edit metadata.namespace if using another namespace.
+# Requires Kubernetes LoadBalancer support. Do not expose unauthenticated UIs
+# directly to the internet; add authentication, TLS, and network restrictions.
+# Replication remains on the existing internal edrr-edr:9090 Service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: edrs-edr-ui
+  namespace: influxdb3-edr
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: influxdb3-edr-adjunct
+    app.kubernetes.io/instance: edrs
+  ports:
+    - name: observability
+      protocol: TCP
+      port: 9091
+      targetPort: 9091
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edrr-edr-ui
+  namespace: influxdb3-edr
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: influxdb3-edr-adjunct
+    app.kubernetes.io/instance: edrr
+  ports:
+    - name: observability
+      protocol: TCP
+      port: 9092
+      targetPort: 9091

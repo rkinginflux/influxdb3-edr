@@ -1,0 +1,20 @@
+# Deny by default: publish only this repository's original docs and examples.
+*
+!.gitignore
+!README.md
+!LICENSE
+!requirements-dev.txt
+!examples/
+!examples/*.yaml
+!manifests/
+!manifests/*.yaml
+!docs/
+!docs/*.md
+!scripts/
+!scripts/*.sh
+!scripts/smoke-test.py
+!tests/
+!tests/test_*.py
+!.github/
+!.github/workflows/
+!.github/workflows/validate.yaml
