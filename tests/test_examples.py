@@ -16,10 +16,13 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 FAKE_CLI = r'''#!/usr/bin/env python3
-import json, os, pathlib, sys
+import fcntl, json, os, pathlib, sys
 name = pathlib.Path(sys.argv[0]).name
 args = sys.argv[1:]
 state_file = pathlib.Path(os.environ['TEST_STATE'])
+# Shell pipelines run multiple command doubles concurrently.
+lock = state_file.with_suffix('.lock').open('a')
+fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
 state = json.loads(state_file.read_text())
 state['calls'].append([name] + args)
 if name == 'helm':
@@ -124,6 +127,12 @@ class SimulatedHelpers(unittest.TestCase):
         chart = self.root/'delivered-chart.tgz'
         chart.write_bytes(b'not-a-real-chart-used-only-by-the-command-double')
         self.env['EDR_CHART'] = str(chart)
+
+    def test_concurrent_command_recorders_preserve_all_calls(self):
+        processes = [subprocess.Popen([str(self.root/'bin/kubectl'),'config','current-context'], env=self.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE) for _ in range(24)]
+        results = [process.communicate() for process in processes]
+        self.assertTrue(all(process.returncode == 0 for process in processes), [stderr.decode() for _, stderr in results if stderr])
+        self.assertEqual(len(self.calls()), 24)
 
     def test_missing_credentials_stop_before_changes(self):
         (self.root/'credentials/source-access-key-id').unlink()
